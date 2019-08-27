@@ -8,15 +8,10 @@ import { Typography } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
   root: (props) => ({
-    width: '1240px',
-    height: '552px',
     flexGrow: 1,
     backgroundImage: `url(${props.image})`,
     backgroundSize: 'cover',
   }),
-  grid: {
-    height: '100%',
-  },
   title: {
     fontSize: '56px',
     fontWeight: 'bold',

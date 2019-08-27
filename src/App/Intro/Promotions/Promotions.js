@@ -18,6 +18,29 @@ import icoDotActive from '../../../assets/dot-active.svg'
 import { ReactComponent as PlayIcon } from '../../../assets/ui_slider_play.svg'
 import { ReactComponent as PauseIcon } from '../../../assets/ui_slider_pause.svg'
 
+const banners = [
+  {
+    title: '전문적이고 안전한',
+    subTitle: '중고폰판매 서비스 리폰',
+    description: '이제 중고폰 거래도,           편의점에서!',
+    image: imgPromo1,
+  },
+  {
+    title: '데이터 유출 걱정없이,',
+    subTitle: '리폰하세요.',
+    description:
+      '고려대학교 포렌식연구소와 함께하는 데이터 이중 삭제\n프로그램으로 안심하고 거래하세요.',
+    image: imgPromo2,
+  },
+  {
+    title: '내 폰은 얼마일까?',
+    subTitle: '리폰에서 확인하세요.',
+    description:
+      '리폰에서 내 폰 시세 조회하면,\n 과거시세부터 미래시세까지 바로 확인 할 수 있습니다.',
+    image: imgPromo3,
+  },
+]
+
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
   icon: { display: 'inline-flex', verticalAlign: 'middle' },
@@ -113,28 +136,6 @@ export default function Promotions() {
 
   console.log(`isPlaying = ${isSliderPlaying}`)
 
-  const banners = [
-    {
-      title: '전문적이고 안전한',
-      subTitle: '중고폰판매 서비스 리폰',
-      description: '이제 중고폰 거래도,           편의점에서!',
-      image: imgPromo1,
-    },
-    {
-      title: '데이터 유출 걱정없이,',
-      subTitle: '리폰하세요.',
-      description:
-        '고려대학교 포렌식연구소와 함께하는 데이터 이중 삭제\n프로그램으로 안심하고 거래하세요.',
-      image: imgPromo2,
-    },
-    {
-      title: '내 폰은 얼마일까?',
-      subTitle: '리폰에서 확인하세요.',
-      description:
-        '리폰에서 내 폰 시세 조회하면,\n 과거시세부터 미래시세까지 바로 확인 할 수 있습니다.',
-      image: imgPromo3,
-    },
-  ]
   return (
     <div>
       <MySlider
@@ -145,10 +146,11 @@ export default function Promotions() {
         {banners.map((banner) => (
           <Banner
             key={banner.image}
-            title={banner.title}
-            subTitle={banner.subTitle}
-            description={banner.description}
-            image={banner.image}
+            {...banner}
+            // title={banner.title}
+            // subTitle={banner.subTitle}
+            // description={banner.description}
+            // image={banner.image}
           />
         ))}
       </MySlider>

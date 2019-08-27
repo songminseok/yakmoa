@@ -3,7 +3,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-import Link from '@material-ui/core/Link'
+// import Link from '@material-ui/core/Link'
+import { Link } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import logo from '../assets/topbar_logo.png'
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     color: 'black',
     background: 'transparent',
     boxShadow: 'none',
-    position: 'absolute',
+    position: 'static',
   },
   logo: {
     width: '254px',
@@ -31,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
     color: '#2c2f31',
     fontSize: 18,
     fontWeight: 'bold',
-    '&:focus, &:hover, &:active': {
-      color: '#17d3d6',
-      textDecoration: 'none',
-    },
   },
   buttonAppDown: {
     '&:hover': {
@@ -47,34 +44,42 @@ const useStyles = makeStyles((theme) => ({
 export default function Topbar() {
   const classes = useStyles()
 
+  function AButton(props) {
+    return (
+      <Button
+        variant={props.variant ? props.variant : 'text'}
+        component={Link}
+        className={classes.link}
+        to={props.to}
+        disableRipple
+      >
+        {props.children}
+      </Button>
+    )
+  }
+
   return (
     <div className={classes.root}>
       <AppBar className={classes.appBar}>
-        <Box my='auto' pl={16} pr={16} clone>
+        <Box my='auto' clone>
           <Toolbar>
             {/* <CardMedia className={classes.logo} image={logo} /> */}
-            <Link className={classes.logo} href='/'>
+            <Link className={classes.logo} to='/'>
               <img className={classes.logo} src={logo} alt='Refone X CU X Kt' />
             </Link>
             <Box className={classes.title} component='span'>
               {' '}
             </Box>
             <Typography component='div'>
-              <Link className={classes.link} href='https://refone.co.kr'>
-                리폰소개
-              </Link>
-              <Link
-                className={classes.link}
-                href='https://refone.co.kr/device/list'
-              >
-                시세조회
-              </Link>
-              <Link className={classes.link}>매장안내</Link>
-              <Link className={classes.link}>이벤트</Link>
+              <AButton to='/'>리폰소개</AButton>
+              <AButton to='/login'>로그인</AButton>
+              <AButton variant='contained' to='/signup'>
+                회원가입
+              </AButton>
             </Typography>
-            <Button className={classes.buttonAppDown} disableRipple>
+            {/* <Button className={classes.buttonAppDown} disableRipple>
               <img src={appDownIco} alt='App Download' />
-            </Button>
+            </Button> */}
           </Toolbar>
         </Box>
       </AppBar>
