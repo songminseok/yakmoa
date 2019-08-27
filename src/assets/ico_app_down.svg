@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="164" height="58" viewBox="0 0 164 58">
+    <defs>
+        <rect id="b" width="154" height="48" rx="24"/>
+        <filter id="a" width="111.7%" height="137.5%" x="-3.9%" y="-12.5%" filterUnits="objectBoundingBox">
+            <feOffset dx="3" dy="3" in="SourceAlpha" result="shadowOffsetOuter1"/>
+            <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2.5"/>
+            <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.03 0"/>
+        </filter>
+        <path id="c" d="M12 17a1.001 1.001 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L11 13.586v-9.58C11 3.45 11.448 3 12 3s1 .45 1 1.006v9.58l3.293-3.293a1 1 0 0 1 1.414 1.414l-5 5A.995.995 0 0 1 12 17zm-8.095 2h16.19c.5 0 .905.448.905 1s-.405 1-.905 1H3.905c-.5 0-.905-.448-.905-1s.405-1 .905-1z"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <use fill="#000" filter="url(#a)" transform="translate(2 2)" xlink:href="#b"/>
+        <path fill="#FFF" stroke="#17D3D6" d="M26 2.5C13.021 2.5 2.5 13.021 2.5 26S13.021 49.5 26 49.5h106c12.979 0 23.5-10.521 23.5-23.5S144.979 2.5 132 2.5H26z"/>
+        <text fill="#17D3D6" font-family="NotoSansCJKkr-Bold, Noto Sans CJK KR" font-size="14" font-weight="bold" transform="translate(2 2)">
+            <tspan x="56" y="28">앱다운로드</tspan>
+        </text>
+        <g transform="translate(26 14)">
+            <path d="M0 0h24v24H0z"/>
+            <use fill="#17D3D6" xlink:href="#c"/>
+        </g>
+    </g>
+</svg>
