@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>Btn / Paging / play</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="10.5 6 3 12 3 0"></polygon>
+    </defs>
+    <g id="01.PC" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="PW-/-PW010001_Home" transform="translate(-630.000000, -606.000000)">
+            <g id="+Hero" transform="translate(152.000000, 224.000000)">
+                <g id="+Headcopy">
+                    <g id="Group" transform="translate(478.000000, 382.000000)">
+                        <g id="Btn-/-Paging-/-play-2">
+                            <g id="Btn-/-Paging-/-play">
+                                <rect id="Area" x="0" y="0" width="12" height="12"></rect>
+                                <mask id="mask-2" fill="white">
+                                    <use xlink:href="#path-1"></use>
+                                </mask>
+                                <use id="Rectangle" fill="#9BA5AB" fill-rule="evenodd" xlink:href="#path-1"></use>
+                                <g id="Color-/-BG-/-Hint_#CAD1D5" mask="url(#mask-2)" fill="#CAD1D5" fill-rule="nonzero">
+                                    <polygon id="Rectangle" points="0 0 12 0 12 12 0 12"></polygon>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

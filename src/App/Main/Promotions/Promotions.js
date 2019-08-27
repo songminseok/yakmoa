@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 import MySlider from 'react-slick'
 import Banner from './Banner'
 import Container from '@material-ui/core/Container'
-import Typography from '@material-ui/core/Typography'
-import Box from '@material-ui/core/Box'
+import Link from '@material-ui/core/Link'
 import { makeStyles } from '@material-ui/core/styles'
 
 import '../../../styles/slick.css'
@@ -14,34 +13,18 @@ import imgPromo2 from '../../../assets/promo-02.png'
 import imgPromo3 from '../../../assets/promo-03.svg'
 import { ReactComponent as ArrowNext } from '../../../assets/ui-slide-simple-next.svg'
 import { ReactComponent as ArrowPrev } from '../../../assets/ui-slide-simple-prev.svg'
-import dotIcon from '../../../assets/dot.svg'
-import dotActiveIcon from '../../../assets/dot-active.svg'
-// import { ReactComponent as DotIcon } from '../../../assets/dot.svg'
-// import { ReactComponent as DotActiveIcon } from '../../../assets/dot-active.svg'
-import PlayArrowIcon from '@material-ui/icons/PlayArrow'
-import PauseIcon from '@material-ui/icons/Pause'
+import icoDot from '../../../assets/dot.svg'
+import icoDotActive from '../../../assets/dot-active.svg'
+import { ReactComponent as PlayIcon } from '../../../assets/ui_slider_play.svg'
+import { ReactComponent as PauseIcon } from '../../../assets/ui_slider_pause.svg'
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
-  dot: {
-    height: '8px',
-    width: '8px',
-    backgroundImage: `url(${dotIcon})`,
-    backgroundPosition: '50% 50%',
-    backgroundRepeat: 'none',
-    margin: '0 auto',
-    '&:focus,&:active': {
-      width: '18px',
-      backgroundImage: `url(${dotActiveIcon})`,
-    },
+  icon: { display: 'inline-flex', verticalAlign: 'middle' },
+  dots: {
+    bottom: '25px',
   },
 }))
-
-/* Dot */
-function Dot(props) {
-  console.log('Dot - ', props)
-  return <Typography {...props}>{props.active ? 'A' : 'O'}</Typography>
-}
 
 /* Arrow 좌우 화살표 */
 function Arrow(props) {
@@ -74,10 +57,12 @@ export default function Promotions() {
   const classes = useStyles()
 
   const [isSliderPlaying, setSliderPlaying] = React.useState(true)
+  const [currentSlide, setCurrentSlide] = React.useState(0)
   const sliderRef = React.useRef(null)
 
   function toggleAutoPlay() {
     console.log(`toggleAutoPlay ${isSliderPlaying} => ${!isSliderPlaying}`)
+    console.log('sliderRef', sliderRef.current)
     if (isSliderPlaying) {
       sliderRef.current.slickPause()
     } else {
@@ -89,49 +74,67 @@ export default function Promotions() {
 
   const carouselProps = {
     dots: true,
-    dotsClass: 'slick-dots slick-thumb',
     infinite: true,
-    speed: 250,
-    autoPlaySpeed: 500,
+    speed: 500,
+    autoPlaySpeed: 2000,
     slidesToShow: 1,
     slidesToScroll: 1,
     appendDots: (dots) => (
-      <Container
-        style={{
-          magin: '0 auto',
-          textAlign: 'center',
-          bottom: '25px',
-        }}
-      >
-        <ul>
-          <li
-            style={{ marginLeft: '-100px', marginRight: '20px' }}
-            onClick={toggleAutoPlay}
-          >
-            {isSliderPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+      <Container className={classes.dots}>
+        <ul
+          style={{
+            display: 'inline-block',
+          }}
+        >
+          <li onClick={toggleAutoPlay} style={{ marginRight: '20px' }}>
+            {isSliderPlaying ? (
+              <PauseIcon className={classes.icon} />
+            ) : (
+              <PlayIcon className={classes.icon} />
+            )}
           </li>
-          {React.Children.map(dots, (dot, index) => {
-            const active = dot.props.className === 'slick-active'
-            console.log(`dot[${index}]=${active}`)
-            return React.cloneElement(dot, {
-              children: <Dot className={classes.dot} active={active} />,
-              active,
-            })
-          })}
+          {dots}
         </ul>
       </Container>
     ),
-    // customPaging: (i) => ,
+    customPaging: (i) => (
+      <Link>
+        <img src={i === currentSlide ? icoDotActive : icoDot} alt='Dot' />
+      </Link>
+    ),
 
     arrows: true,
     prevArrow: <Arrow type='prev' />,
     nextArrow: <Arrow type='next' />,
     autoplay: true,
+    beforeChange: (current, next) => setCurrentSlide(next),
     // afterChange: (current, next) => setCurrentSlide(current),
   }
 
   console.log(`isPlaying = ${isSliderPlaying}`)
 
+  const banners = [
+    {
+      title: '전문적이고 안전한',
+      subTitle: '중고폰판매 서비스 리폰',
+      description: '이제 중고폰 거래도,           편의점에서!',
+      image: imgPromo1,
+    },
+    {
+      title: '데이터 유출 걱정없이,',
+      subTitle: '리폰하세요.',
+      description:
+        '고려대학교 포렌식연구소와 함께하는 데이터 이중 삭제 프로그램으로 안심하고 거래하세요.',
+      image: imgPromo2,
+    },
+    {
+      title: '내 폰은 얼마일까?',
+      subTitle: '리폰에서 확인하세요.',
+      description:
+        '리폰에서 내 폰 시세 조회하면,\n 과거시세부터 미래시세까지 바로 확인 할 수 있습니다.',
+      image: imgPromo3,
+    },
+  ]
   return (
     <div>
       <MySlider
@@ -139,11 +142,15 @@ export default function Promotions() {
         style={{ margin: '30px auto 50px', width: '1240px' }}
         {...carouselProps}
       >
-        {[imgPromo1, imgPromo2, imgPromo3, imgPromo1].map((img) => (
-          <Banner key={img} image={img} />
+        {banners.map((banner) => (
+          <Banner
+            key={banner.image}
+            title={banner.title}
+            subTitle={banner.subTitle}
+            description={banner.description}
+            image={banner.image}
+          />
         ))}
-        {/* <Banner image={imgPromo2} />
-        <Banner image={imgPromo3} /> */}
       </MySlider>
     </div>
   )
