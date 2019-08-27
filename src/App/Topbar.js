@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import logo from '../assets/topbar_logo.png'
-import appDownIco from '../assets/ico_app_down.svg'
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
@@ -81,9 +80,6 @@ export default function Topbar() {
                 회원가입
               </AButton>
             </Typography>
-            {/* <Button className={classes.buttonAppDown} disableRipple>
-              <img src={appDownIco} alt='App Download' />
-            </Button> */}
           </Toolbar>
         </Box>
       </AppBar>
