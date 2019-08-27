@@ -28,10 +28,14 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   link: {
-    margin: theme.spacing(3),
+    marginLeft: theme.spacing(3),
     color: '#2c2f31',
     fontSize: 18,
     fontWeight: 'bold',
+    '&:hover,&:active': {
+      color: '#17d3d6',
+      backgroundColor: 'transparent',
+    },
   },
   buttonAppDown: {
     '&:hover': {
@@ -61,7 +65,7 @@ export default function Topbar() {
   return (
     <div className={classes.root}>
       <AppBar className={classes.appBar}>
-        <Box my='auto' clone>
+        <Box my='auto' mx={2} clone>
           <Toolbar>
             {/* <CardMedia className={classes.logo} image={logo} /> */}
             <Link className={classes.logo} to='/'>
