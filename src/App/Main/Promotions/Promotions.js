@@ -124,7 +124,7 @@ export default function Promotions() {
       title: '데이터 유출 걱정없이,',
       subTitle: '리폰하세요.',
       description:
-        '고려대학교 포렌식연구소와 함께하는 데이터 이중 삭제 프로그램으로 안심하고 거래하세요.',
+        '고려대학교 포렌식연구소와 함께하는 데이터 이중 삭제\n프로그램으로 안심하고 거래하세요.',
       image: imgPromo2,
     },
     {

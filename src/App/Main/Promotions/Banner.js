@@ -69,7 +69,16 @@ function Banner(props) {
       <Typography align='left' component='div'>
         <Box className={classes.title}>{title}</Box>
         <Box className={classes.subTitle}>{subTitle}</Box>
-        <Box className={classes.description}>{description}</Box>
+        <Box className={classes.description}>
+          {description.split('\n').map((line, key) => {
+            return (
+              <span key={key}>
+                {line}
+                <br />
+              </span>
+            )
+          })}
+        </Box>
       </Typography>
       <Button className={classes.button}> 자세히 보기 </Button>
     </Grid>
