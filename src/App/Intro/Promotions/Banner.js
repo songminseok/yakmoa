@@ -8,6 +8,7 @@ import { Typography } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
   root: (props) => ({
+    height: '500px',
     flexGrow: 1,
     backgroundImage: `url(${props.image})`,
     backgroundSize: 'cover',

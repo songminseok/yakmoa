@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-// import Link from '@material-ui/core/Link'
 import { Link } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
@@ -47,12 +46,13 @@ const useStyles = makeStyles((theme) => ({
 export default function Topbar() {
   const classes = useStyles()
 
-  function AButton(props) {
+  function LinkButton(props) {
     return (
       <Button
         variant={props.variant ? props.variant : 'text'}
         component={Link}
         className={classes.link}
+        href={props.to}
         to={props.to}
         disableRipple
       >
@@ -74,11 +74,11 @@ export default function Topbar() {
               {' '}
             </Box>
             <Typography component='div'>
-              <AButton to='/'>리폰소개</AButton>
-              <AButton to='/login'>로그인</AButton>
-              <AButton variant='contained' to='/signup'>
+              <LinkButton to='/'>리폰소개</LinkButton>
+              <LinkButton to='/login'>로그인</LinkButton>
+              <LinkButton variant='contained' to='/signup'>
                 회원가입
-              </AButton>
+              </LinkButton>
             </Typography>
           </Toolbar>
         </Box>
