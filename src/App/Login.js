@@ -11,6 +11,27 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+/** yup - for validation */
+import * as yup from 'yup';
+
+let schema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required(),
+  password: yup
+    .string()
+    .min(6)
+    .required(),
+  // createdOn: yup.date().default(function() {
+  //   return new Date();
+  // }),
+});
+
+const yupOptions = {
+  abortEarly: true,
+};
+
 const useStyles = makeStyles(theme => ({
   margin: {
     margin: theme.spacing(1),
@@ -21,6 +42,10 @@ const useStyles = makeStyles(theme => ({
 export default function Login() {
   const classes = useStyles();
   const [loginInfo, setLoginInfo] = React.useState({ email: '', password: '' });
+  const [inputError, setInputError] = React.useState({
+    email: '',
+    password: '',
+  });
   const loginButton = React.useRef(null);
 
   const handleChange = e => {
@@ -47,38 +72,39 @@ export default function Login() {
       firebase.auth().signOut();
       // [END signout]
     } else {
-      if (email.length < 4) {
-        alert('Please enter an email address.');
-        return;
-      }
-      if (password.length < 4) {
-        alert('Please enter a password.');
-        return;
-      }
-      // Sign in with email and pass.
-      // [START authwithemail]
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(function(user) {
-          const userlog = JSON.stringify(user, 2);
-          alert(`Successfully logged in ${userlog}`);
-          console.log('logged in ', user);
+      // validation with yup
+      schema
+        .validate(loginInfo, yupOptions)
+        .then(function(valid) {
+          console.log('loginInfo is ', valid ? 'valid' : 'invalid');
+          firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(function(user) {
+              const userlog = JSON.stringify(user, 2);
+              alert(`Successfully logged in ${userlog}`);
+              console.log('logged in ', user);
+            })
+            .catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // [START_EXCLUDE]
+              if (errorCode === 'auth/wrong-password') {
+                alert('Wrong password.');
+              } else {
+                alert(errorMessage);
+              }
+              console.log(error);
+              loginButton.current.disabled = false;
+              // [END_EXCLUDE]
+            });
         })
         .catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // [START_EXCLUDE]
-          if (errorCode === 'auth/wrong-password') {
-            alert('Wrong password.');
-          } else {
-            alert(errorMessage);
-          }
           console.log(error);
-          loginButton.current.disabled = false;
-          // [END_EXCLUDE]
+          setInputError({ [error.path]: error.message });
         });
+
       // [END authwithemail]
     }
     loginButton.current.disabled = true;
@@ -99,7 +125,9 @@ export default function Login() {
             value={loginInfo.email}
             onChange={handleChange}
           />
-          <FormHelperText id="email-helper-text">이메일</FormHelperText>
+          <FormHelperText id="email-helper-text" error={!!inputError.email}>
+            {inputError.email ? inputError.email : '이메일'}
+          </FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={4}>
@@ -112,7 +140,12 @@ export default function Login() {
             value={loginInfo.password}
             onChange={handleChange}
           />
-          <FormHelperText id="password-helper-text">비밀번호</FormHelperText>
+          <FormHelperText
+            id="password-helper-text"
+            error={!!inputError.password}
+          >
+            {inputError.password ? inputError.password : '비밀번호'}
+          </FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={4}>
