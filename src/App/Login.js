@@ -15,13 +15,13 @@ import Button from '@material-ui/core/Button';
 import * as yup from 'yup';
 
 let schema = yup.object().shape({
-  email: yup
-    .string()
-    .email()
-    .required(),
   password: yup
     .string()
     .min(6)
+    .required(),
+  email: yup
+    .string()
+    .email()
     .required(),
   // createdOn: yup.date().default(function() {
   //   return new Date();
@@ -32,7 +32,7 @@ const yupOptions = {
   abortEarly: true,
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
     flexGrow: '1',
@@ -41,27 +41,50 @@ const useStyles = makeStyles(theme => ({
 
 export default function Login() {
   const classes = useStyles();
-  const [loginInfo, setLoginInfo] = React.useState({ email: '', password: '' });
+  const [loginInfo, setLoginInfo] = React.useState({
+    email: '',
+    password: '',
+  });
   const [inputError, setInputError] = React.useState({
     email: '',
     password: '',
   });
   const loginButton = React.useRef(null);
 
-  const handleChange = e => {
-    console.log('handleChange');
+  function handleChange(e) {
     const newLoginInfo = {
       ...loginInfo,
       [e.target.name]: e.target.value,
     };
     setLoginInfo(newLoginInfo);
-    console.log(newLoginInfo);
-  };
+    validateInput(e.target, newLoginInfo);
+  }
+
+  function updateInputError(error) {
+    const newInputError = { ...inputError, ...error };
+    setInputError(newInputError);
+  }
+
+  function validateInput(input, login) {
+    schema
+      .validateAt(input.name, login)
+      .then(function(valid) {
+        if (valid) {
+          updateInputError({ [input.name]: '' });
+        }
+      })
+      .catch(function(error) {
+        updateInputError({ [input.name]: error.message });
+      });
+  }
+
+  function handleBlur(e) {
+    validateInput(e.target, loginInfo);
+  }
   /**
    * Handles the sign in button press.
    */
   function toggleSignIn(e) {
-    console.log('toggleSignIn');
     e.preventDefault();
 
     const { email, password } = loginInfo;
@@ -111,37 +134,39 @@ export default function Login() {
   }
 
   return (
-    <Grid container spacing={2} direction="column" alignContent="center">
+    <Grid container spacing={2} direction='column' alignContent='center'>
       <Grid item xs={4}>
-        <Typography variant="h3">Log in to YakMoa</Typography>
+        <Typography variant='h3'>Log in to YakMoa</Typography>
       </Grid>
       <Grid item xs={4}>
         <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor="email">Email</InputLabel>
+          <InputLabel htmlFor='email'>Email</InputLabel>
           <Input
-            id="email"
-            name="email"
-            type="email"
+            id='email'
+            name='email'
+            type='email'
             value={loginInfo.email}
             onChange={handleChange}
+            onBlur={handleBlur}
           />
-          <FormHelperText id="email-helper-text" error={!!inputError.email}>
+          <FormHelperText id='email-helper-text' error={!!inputError.email}>
             {inputError.email ? inputError.email : '이메일'}
           </FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={4}>
         <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor="password">Password</InputLabel>
+          <InputLabel htmlFor='password'>Password</InputLabel>
           <Input
-            id="password"
-            name="password"
-            type="password"
+            id='password'
+            name='password'
+            type='password'
             value={loginInfo.password}
             onChange={handleChange}
+            onBlur={handleBlur}
           />
           <FormHelperText
-            id="password-helper-text"
+            id='password-helper-text'
             error={!!inputError.password}
           >
             {inputError.password ? inputError.password : '비밀번호'}
@@ -152,9 +177,17 @@ export default function Login() {
         <FormControl className={classes.margin} fullWidth>
           <Button
             ref={loginButton}
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             onClick={toggleSignIn}
+            disabled={
+              !(
+                loginInfo.email &&
+                !inputError.email &&
+                loginInfo.password &&
+                !inputError.password
+              )
+            }
           >
             Log In
           </Button>
