@@ -1,12 +1,18 @@
-import React from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import { Link } from 'react-router-dom'
-import Button from '@material-ui/core/Button'
-import Box from '@material-ui/core/Box'
-import logo from '../assets/topbar_logo.png'
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { Link } from 'react-router-dom';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
+import logo from '../assets/topbar_logo.png';
+
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import * as firebase from 'firebase/app';
+
+// Add the Firebase products that you want to use
+import 'firebase/auth';
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
@@ -41,24 +47,29 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   title: { flexGrow: 1 },
-}))
+}));
 
-export default function Topbar() {
-  const classes = useStyles()
+export default function Topbar({ user }) {
+  const classes = useStyles();
 
   function LinkButton(props) {
     return (
       <Button
         variant={props.variant ? props.variant : 'text'}
-        component={Link}
+        component={!props.onClick ? Link : 'button'}
         className={classes.link}
         href={props.to}
         to={props.to}
+        onClick={props.onClick}
         disableRipple
       >
         {props.children}
       </Button>
-    )
+    );
+  }
+
+  function handleLogout() {
+    firebase.auth().signOut();
   }
 
   return (
@@ -74,15 +85,30 @@ export default function Topbar() {
               {' '}
             </Box>
             <Typography component='div'>
-              <LinkButton to='/'>리폰소개</LinkButton>
-              <LinkButton to='/login'>로그인</LinkButton>
-              <LinkButton variant='contained' to='/signup'>
-                회원가입
-              </LinkButton>
+              {!user && <LinkButton to='/'>리폰소개</LinkButton>}
+              {!user ? (
+                <LinkButton to='/login'>로그인</LinkButton>
+              ) : (
+                <>
+                  <Typography
+                    variant='subtitle1'
+                    style={{ marginLeft: '40px' }}
+                    component='span'
+                  >
+                    {user.email}
+                  </Typography>
+                  <LinkButton onClick={handleLogout}>로그아웃</LinkButton>
+                </>
+              )}
+              {!user && (
+                <LinkButton variant='contained' to='/signup'>
+                  회원가입
+                </LinkButton>
+              )}
             </Typography>
           </Toolbar>
         </Box>
       </AppBar>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import './App.css';
 import Topbar from './Topbar';
@@ -31,14 +31,25 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 function App() {
+  const [currentUser, setCurrentUser] = React.useState(null);
+
+  /** User Auth check status */
+  React.useEffect(() => {
+    return firebase.auth().onAuthStateChanged(function(user) {
+      setCurrentUser(user);
+    });
+  }, []);
+
   return (
-    <div className="App">
+    <div className='App'>
       <CssBaseline />
       <Router>
-        <Topbar />
-        <Route path="/" exact component={Intro} />
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
+        <Topbar user={currentUser} />
+        <Switch>
+          <Route path='/' exact component={Intro} />
+          <Route path='/login' component={Login} />
+          <Route path='/signup' component={Signup} />
+        </Switch>
       </Router>
       <Footer />
     </div>

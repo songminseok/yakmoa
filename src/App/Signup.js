@@ -124,7 +124,7 @@ export default function Signup(props) {
               id='email'
               name='email'
               type='email'
-              value={signupInfo.email}
+              // value={signupInfo.email}
               onChange={handleChange}
               onBlur={handleBlur}
             />
