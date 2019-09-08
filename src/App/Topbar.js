@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   title: { flexGrow: 1 },
 }));
 
-export default function Topbar({ user }) {
+function Topbar({ user }) {
   const classes = useStyles();
 
   function LinkButton(props) {
@@ -112,3 +113,5 @@ export default function Topbar({ user }) {
     </div>
   );
 }
+
+export default connect((state) => ({ user: state.user }))(Topbar);

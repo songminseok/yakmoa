@@ -1,6 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
+// Import redux store
+import { Provider } from 'react-redux';
+import {
+  setAuthenticated,
+  setUnAuthenticated,
+  setUser,
+} from '../redux/actions';
+import store from '../redux/store';
+
 import './App.css';
 import Topbar from './Topbar';
 import Intro from './Intro';
@@ -31,27 +40,28 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 function App() {
-  const [currentUser, setCurrentUser] = React.useState(null);
-
   /** User Auth check status */
   React.useEffect(() => {
     return firebase.auth().onAuthStateChanged(function(user) {
-      setCurrentUser(user);
+      store.dispatch(!user ? setUnAuthenticated() : setAuthenticated());
+      store.dispatch(setUser(user));
     });
   }, []);
 
   return (
     <div className='App'>
-      <CssBaseline />
-      <Router>
-        <Topbar user={currentUser} />
-        <Switch>
-          <Route path='/' exact component={Intro} />
-          <Route path='/login' component={Login} />
-          <Route path='/signup' component={Signup} />
-        </Switch>
-      </Router>
-      <Footer />
+      <Provider store={store}>
+        <CssBaseline />
+        <Router>
+          <Topbar />
+          <Switch>
+            <Route path='/' exact component={Intro} />
+            <Route path='/login' component={Login} />
+            <Route path='/signup' component={Signup} />
+          </Switch>
+        </Router>
+        <Footer />
+      </Provider>
     </div>
   );
 }

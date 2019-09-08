@@ -54,8 +54,7 @@ export default function Signup(props) {
   });
   const [user, setUser] = React.useState(null);
 
-  function signUp(e) {
-    console.log(`signUp ${JSON.stringify(signupInfo, 2)}`);
+  function signUp() {
     // First Check if the 2 passwords match
     const { email, password, passwordConfirm } = signupInfo;
     if (password === passwordConfirm) {
@@ -83,12 +82,10 @@ export default function Signup(props) {
     schema
       .validateAt(name, newSignupInfo)
       .then(function(valid) {
-        console.log('validateInput', valid);
         newSignupInfo.errors[name] = '';
         setSignUpInfo(newSignupInfo);
       })
       .catch(function(error) {
-        console.log('validateInput', error);
         newSignupInfo.errors[name] = error.message;
         setSignUpInfo(newSignupInfo);
       });
