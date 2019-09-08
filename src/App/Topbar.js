@@ -71,7 +71,6 @@ function Topbar({ user, history }) {
   }
 
   function handleLogout() {
-    console.log('handleLogout with ', history);
     firebase
       .auth()
       .signOut()
