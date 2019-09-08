@@ -12,7 +12,27 @@ import Button from '@material-ui/core/Button';
 import * as firebase from 'firebase';
 import 'firebase/auth';
 
-const useStyles = makeStyles(theme => ({
+/** Yub */
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  passwordConfirm: yup
+    .string()
+    .oneOf([yup.ref('password'), ''], 'Must match with password'),
+  password: yup
+    .string()
+    .min(6)
+    .required(),
+  email: yup
+    .string()
+    .email()
+    .required(),
+  // createdOn: yup.date().default(function() {
+  //   return new Date();
+  // }),
+});
+
+const useStyles = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
     flexGrow: '1',
@@ -25,15 +45,9 @@ export default function Signup() {
     email: '',
     password: '',
     passwordConfirm: '',
+    errors: {},
   });
-
-  function handleChange(e) {
-    console.log(e);
-
-    const newSignupInfo = { ...signupInfo, [e.target.name]: e.target.value };
-    setSignUpInfo(newSignupInfo);
-    console.log(newSignupInfo);
-  }
+  const [user, setUser] = React.useState(null);
 
   function signUp(e) {
     console.log(`signUp ${JSON.stringify(signupInfo, 2)}`);
@@ -59,55 +73,111 @@ export default function Signup() {
     }
   }
 
+  function validateInput(name, value) {
+    const newSignupInfo = { ...signupInfo, [name]: value };
+    schema
+      .validateAt(name, newSignupInfo)
+      .then(function(valid) {
+        console.log('validateInput', valid);
+        newSignupInfo.errors[name] = '';
+        setSignUpInfo(newSignupInfo);
+      })
+      .catch(function(error) {
+        console.log('validateInput', error);
+        newSignupInfo.errors[name] = error.message;
+        setSignUpInfo(newSignupInfo);
+      });
+  }
+
+  function handleBlur({ target: { name, value } }) {
+    validateInput(name, value);
+  }
+
+  function handleChange({ target: { name, value } }) {
+    validateInput(name, value);
+  }
+
   return (
-    <Grid container spacing={2} direction="column" alignContent="center">
+    <Grid container spacing={2} direction='column' alignContent='center'>
       <Grid item xs={4}>
-        <Typography variant="h3">Sign up to YakMoa</Typography>
+        <Typography variant='h3'>Sign up to YakMoa</Typography>
       </Grid>
       <Grid item xs={4}>
         <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor="email">Email</InputLabel>
+          <InputLabel htmlFor='email'>Email</InputLabel>
           <Input
-            id="email"
-            name="email"
-            type="email"
+            id='email'
+            name='email'
+            type='email'
             value={signupInfo.email}
             onChange={handleChange}
+            onBlur={handleBlur}
           />
-          <FormHelperText id="email-helper-text">이메일</FormHelperText>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor="password">Password</InputLabel>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            value={signupInfo.password}
-            onChange={handleChange}
-          />
-          <FormHelperText id="password-helper-text">비밀번호</FormHelperText>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor="passwordConfirm">Confirm Password</InputLabel>
-          <Input
-            id="passwordConfirm"
-            name="passwordConfirm"
-            type="password"
-            value={signupInfo.passwordConfirm}
-            onChange={handleChange}
-          />
-          <FormHelperText id="passwordConfirm-helper-text">
-            비밀번호 확인
+          <FormHelperText
+            id='email-helper-text'
+            error={!!signupInfo.errors.email}
+          >
+            {!signupInfo.errors.email ? '이메일' : signupInfo.errors.email}
           </FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={4}>
         <FormControl className={classes.margin} fullWidth>
-          <Button variant="contained" color="primary" onClick={signUp}>
+          <InputLabel htmlFor='password'>Password</InputLabel>
+          <Input
+            id='password'
+            name='password'
+            type='password'
+            value={signupInfo.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          <FormHelperText
+            id='password-helper-text'
+            error={!!signupInfo.errors.password}
+          >
+            {!signupInfo.errors.password
+              ? '비밀번호'
+              : signupInfo.errors.password}
+          </FormHelperText>
+        </FormControl>
+      </Grid>
+      <Grid item xs={4}>
+        <FormControl className={classes.margin} fullWidth>
+          <InputLabel htmlFor='passwordConfirm'>Confirm Password</InputLabel>
+          <Input
+            id='passwordConfirm'
+            name='passwordConfirm'
+            type='password'
+            value={signupInfo.passwordConfirm}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          <FormHelperText
+            id='passwordConfirm-helper-text'
+            error={!!signupInfo.errors.passwordConfirm}
+          >
+            {!signupInfo.errors.passwordConfirm
+              ? '비밀번호 확인'
+              : signupInfo.errors.passwordConfirm}
+          </FormHelperText>
+        </FormControl>
+      </Grid>
+      <Grid item xs={4}>
+        <FormControl className={classes.margin} fullWidth>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={signUp}
+            disabled={
+              !signupInfo.email ||
+              !signupInfo.password ||
+              !signupInfo.passwordConfirm ||
+              !!signupInfo.errors.email ||
+              !!signupInfo.errors.password ||
+              !!signupInfo.errors.passwordConfirm
+            }
+          >
             Sign Up
           </Button>
         </FormControl>
