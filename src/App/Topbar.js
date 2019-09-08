@@ -1,4 +1,5 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   title: { flexGrow: 1 },
 }));
 
-function Topbar({ user }) {
+function Topbar({ user, history }) {
   const classes = useStyles();
 
   function LinkButton(props) {
@@ -70,7 +71,15 @@ function Topbar({ user }) {
   }
 
   function handleLogout() {
-    firebase.auth().signOut();
+    console.log('handleLogout with ', history);
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        console.log('history push', history);
+        history.push('/');
+      });
+    // history.push('/');
   }
 
   return (
@@ -114,4 +123,4 @@ function Topbar({ user }) {
   );
 }
 
-export default connect((state) => ({ user: state.user }))(Topbar);
+export default connect((state) => ({ user: state.user }))(withRouter(Topbar));
