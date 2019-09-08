@@ -1,6 +1,6 @@
 import React from 'react';
-/** firebase */
-import * as firebase from 'firebase';
+import { connect } from 'react-redux';
+import { logInRequest, logOut } from '../redux/actions';
 
 import { makeStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Dialog, DialogContentText, DialogContent } from '@material-ui/core';
 
 /** yup - for validation */
 import * as yup from 'yup';
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+function Login({ currentUser, loading, loginError, logInRequest, logOut }) {
   const classes = useStyles();
   const [loginInfo, setLoginInfo] = React.useState({
     email: '',
@@ -47,14 +48,6 @@ export default function Login() {
     email: '',
     password: '',
   });
-  const [currentUser, setCurrentUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    return firebase.auth().onAuthStateChanged(function(user) {
-      setCurrentUser(user);
-    });
-  }, []);
 
   function updateInputError(error) {
     const newInputError = { ...inputError, ...error };
@@ -74,43 +67,6 @@ export default function Login() {
       });
   }
 
-  function signOut(e) {
-    firebase.auth().signOut();
-  }
-  /**
-   * Handles the sign in button press.
-   */
-  function signIn(e) {
-    const { email, password } = loginInfo;
-
-    setLoading(true);
-    // validation with yup
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(function(user) {
-        const userlog = JSON.stringify(user, 2);
-        setLoading(false);
-        // alert(`Successfully logged in ${userlog}`)
-        console.log('logged in ', userlog);
-      })
-      .catch(function(error) {
-        setLoading(false);
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // [START_EXCLUDE]
-        if (errorCode === 'auth/wrong-password') {
-          alert('Wrong password.');
-        } else {
-          alert(errorMessage);
-        }
-        console.log(error);
-        // [END_EXCLUDE]
-      });
-    // [END authwithemail]
-  }
-
   function handleChange(e) {
     const newLoginInfo = {
       ...loginInfo,
@@ -123,6 +79,8 @@ export default function Login() {
   function handleBlur(e) {
     validateInput(e.target, loginInfo);
   }
+
+  function handleClose() {}
 
   const loginInForm = (
     <>
@@ -169,7 +127,9 @@ export default function Login() {
           <Button
             variant='contained'
             color='primary'
-            onClick={signIn}
+            onClick={() => {
+              logInRequest(loginInfo.email, loginInfo.password);
+            }}
             disabled={
               !(
                 loginInfo.email &&
@@ -184,6 +144,13 @@ export default function Login() {
           </Button>
         </FormControl>
       </Grid>
+      {loginError && (
+        <Grid item xs={4}>
+          <Typography variant='subtitle2' style={{ color: 'red' }}>
+            {loginError.message}
+          </Typography>
+        </Grid>
+      )}
     </>
   );
 
@@ -200,7 +167,7 @@ export default function Login() {
             </Typography>
           </Grid>
           <Grid item xs={4}>
-            <Button onClick={signOut}>Log Out</Button>
+            <Button onClick={logOut}>Log Out</Button>
           </Grid>
         </>
       ) : (
@@ -209,3 +176,12 @@ export default function Login() {
     </Grid>
   );
 }
+
+export default connect(
+  (state) => ({
+    currentUser: state.user,
+    loading: state.userLoading,
+    loginError: state.loginError,
+  }),
+  { logInRequest, logOut }
+)(Login);
