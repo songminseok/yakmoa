@@ -5,8 +5,30 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import * as yup from 'yup'; // for everything
+import * as firebase from 'firebase/app';
+import {
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  DialogTitle,
+} from '@material-ui/core';
+import { withRouter } from 'react-router-dom';
+
+const loginSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required('이메일이 필요해요'),
+  password: yup
+    .string()
+    .min(6)
+    .required(),
+});
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -15,39 +37,130 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+function Login({ history }) {
+  const [loginInfo, setLoginInfo] = React.useState({ email: '', password: '' });
+  const [error, setError] = React.useState({ email: '', password: '' });
+  const [loading, setLoading] = React.useState(false);
+  const [user, setUser] = React.useState(null);
   const classes = useStyles();
 
+  function validateInput(e, loginInfo) {
+    const name = e.target.name;
+    loginSchema
+      .validateAt(name, loginInfo)
+      .then((valid) => {
+        setError({ ...error, [name]: '' });
+      })
+      .catch((error) => {
+        setError({ ...error, [name]: error.message });
+      });
+  }
+
+  function handleChange(e) {
+    const newLoginInfo = { ...loginInfo, [e.target.name]: e.target.value };
+    validateInput(e, newLoginInfo);
+    setLoginInfo(newLoginInfo);
+  }
+
+  function handleBlur(e) {
+    validateInput(e, loginInfo);
+  }
+
+  function handleLogin() {
+    const { email, password } = loginInfo;
+    setLoading(true);
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((user) => {
+        setLoading(false);
+        setUser(user);
+        console.log('Success', user);
+      })
+      .catch(function(error) {
+        setLoading(false);
+        console.log('Fail', error.message);
+      });
+  }
+
+  function handleClose() {
+    setUser(null);
+  }
+
+  function handleCloseAndHome() {
+    setUser(null);
+    history.push('/');
+  }
+
+  function isValidInput() {
+    return (
+      loginInfo.email && loginInfo.password && !error.email && !error.password
+    );
+  }
+
+  const open = !!user;
+
   return (
-    <Grid container spacing={2} direction='column' alignContent='center'>
-      <Grid item xs={4}>
-        <Typography variant='h3'>Log in to YakMoa</Typography>
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor='input-username'>Email</InputLabel>
-          <Input id='input-username' type='email' />
-          <FormHelperText id='input-username-helper-text'>
-            이메일
-          </FormHelperText>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl className={classes.margin} fullWidth>
-          <InputLabel htmlFor='input-password'>Password</InputLabel>
-          <Input id='input-password' />
-          <FormHelperText id='input-assword-helper-text'>
-            비밀번호
-          </FormHelperText>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl className={classes.margin} fullWidth>
-          <Button variant='contained' color='primary'>
-            Log In
+    <Container maxWidth='xs'>
+      <Typography variant='h3'>Log in to YakMoa</Typography>
+      <FormControl className={classes.margin} fullWidth>
+        <InputLabel htmlFor='input-username'>Email</InputLabel>
+        <Input
+          id='input-username'
+          name='email'
+          type='email'
+          value={loginInfo.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <FormHelperText id='input-username-helper-text' error={!!error.email}>
+          {error.email}
+        </FormHelperText>
+      </FormControl>
+      <FormControl className={classes.margin} fullWidth>
+        <InputLabel htmlFor='input-password'>Password</InputLabel>
+        <Input
+          id='input-password'
+          name='password'
+          value={loginInfo.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <FormHelperText id='input-assword-helper-text' error={!!error.password}>
+          {error.password}
+        </FormHelperText>
+      </FormControl>
+      <FormControl className={classes.margin} fullWidth>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={handleLogin}
+          disabled={!isValidInput() || loading}
+        >
+          Log In {loading && <CircularProgress />}
+        </Button>
+      </FormControl>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{'로그인 성공'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            로그인 되었습니다.{' '}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAndHome} color='primary' autoFocus>
+            OK
           </Button>
-        </FormControl>
-      </Grid>
-    </Grid>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }
+
+export default Login;
