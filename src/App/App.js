@@ -1,7 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
 
 import './App.css';
+import * as actions from '../store/actions';
+import store from '../store';
+
 import Topbar from './Topbar';
 import Intro from './Intro';
 import Login from './Login';
@@ -31,17 +35,31 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 function App() {
+  React.useEffect(() => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(`${user.email} is authenticated`);
+        store.dispatch(actions.setUser(user));
+      } else {
+        console.log('no user!');
+        store.dispatch(actions.setUser(null));
+      }
+    });
+  }, []);
+
   return (
-    <div className='App'>
-      <CssBaseline />
-      <Router>
-        <Topbar />
-        <Route path='/' exact component={Intro} />
-        <Route path='/login' component={Login} />
-        <Route path='/signup' component={Signup} />
-      </Router>
-      <Footer />
-    </div>
+    <Provider store={store}>
+      <div className='App'>
+        <CssBaseline />
+        <Router>
+          <Topbar />
+          <Route path='/' exact component={Intro} />
+          <Route path='/login' component={Login} />
+          <Route path='/signup' component={Signup} />
+        </Router>
+        <Footer />
+      </div>
+    </Provider>
   );
 }
 

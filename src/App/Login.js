@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { loginRequested } from '../store/actions';
 import { makeStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
@@ -8,7 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import * as yup from 'yup'; // for everything
-import * as firebase from 'firebase/app';
 import {
   CircularProgress,
   Dialog,
@@ -17,7 +18,6 @@ import {
   DialogActions,
   DialogTitle,
 } from '@material-ui/core';
-import { withRouter } from 'react-router-dom';
 
 const loginSchema = yup.object().shape({
   email: yup
@@ -37,11 +37,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Login({ history }) {
+function Login({ loading, user, history, loginRequested }) {
   const [loginInfo, setLoginInfo] = React.useState({ email: '', password: '' });
   const [error, setError] = React.useState({ email: '', password: '' });
-  const [loading, setLoading] = React.useState(false);
-  const [user, setUser] = React.useState(null);
   const classes = useStyles();
 
   function validateInput(e, loginInfo) {
@@ -68,27 +66,11 @@ function Login({ history }) {
 
   function handleLogin() {
     const { email, password } = loginInfo;
-    setLoading(true);
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((user) => {
-        setLoading(false);
-        setUser(user);
-        console.log('Success', user);
-      })
-      .catch(function(error) {
-        setLoading(false);
-        console.log('Fail', error.message);
-      });
-  }
-
-  function handleClose() {
-    setUser(null);
+    console.log('handleLogin', email, password);
+    loginRequested(email, password);
   }
 
   function handleCloseAndHome() {
-    setUser(null);
     history.push('/');
   }
 
@@ -143,7 +125,7 @@ function Login({ history }) {
 
       <Dialog
         open={open}
-        onClose={handleClose}
+        // onClose={handleClose}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
@@ -163,4 +145,7 @@ function Login({ history }) {
   );
 }
 
-export default Login;
+export default connect(
+  (state) => ({ loading: state.loading, user: state.user }),
+  { loginRequested }
+)(Login);

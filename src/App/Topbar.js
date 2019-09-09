@@ -1,12 +1,16 @@
-import React from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import { Link } from 'react-router-dom'
-import Button from '@material-ui/core/Button'
-import Box from '@material-ui/core/Box'
-import logo from '../assets/topbar_logo.png'
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { Link } from 'react-router-dom';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
+import logo from '../assets/topbar_logo.png';
+import * as firebase from 'firebase/app';
+import { logoutRequested } from '../store/actions';
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
@@ -41,24 +45,30 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   title: { flexGrow: 1 },
-}))
+}));
 
-export default function Topbar() {
-  const classes = useStyles()
+function LinkButton(props) {
+  const classes = useStyles();
 
-  function LinkButton(props) {
-    return (
-      <Button
-        variant={props.variant ? props.variant : 'text'}
-        component={Link}
-        className={classes.link}
-        href={props.to}
-        to={props.to}
-        disableRipple
-      >
-        {props.children}
-      </Button>
-    )
+  return (
+    <Button
+      variant={props.variant ? props.variant : 'text'}
+      component={Link}
+      className={classes.link}
+      href={props.to}
+      to={props.to}
+      disableRipple
+    >
+      {props.children}
+    </Button>
+  );
+}
+
+function Topbar({ user, history, logoutRequested }) {
+  const classes = useStyles();
+
+  function handleLogout() {
+    logoutRequested();
   }
 
   return (
@@ -75,14 +85,32 @@ export default function Topbar() {
             </Box>
             <Typography component='div'>
               <LinkButton to='/'>리폰소개</LinkButton>
-              <LinkButton to='/login'>로그인</LinkButton>
-              <LinkButton variant='contained' to='/signup'>
-                회원가입
-              </LinkButton>
+              {!user && <LinkButton to='/login'>로그인</LinkButton>}
+              {!user && (
+                <LinkButton variant='contained' to='/signup'>
+                  회원가입
+                </LinkButton>
+              )}
+              {user && (
+                <Button
+                  onClick={handleLogout}
+                  variant='contained'
+                  className={classes.link}
+                >
+                  {`${user.email}    `}로그아웃
+                </Button>
+              )}
             </Typography>
           </Toolbar>
         </Box>
       </AppBar>
     </div>
-  )
+  );
 }
+
+export default connect(
+  (state) => ({
+    user: state.user,
+  }),
+  { logoutRequested }
+)(withRouter(Topbar));
