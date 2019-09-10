@@ -101,7 +101,7 @@ export default function Signup({ history }) {
 
   function handleCloseAndHome() {
     setUser(null);
-    history.push('/');
+    history.push('/dashboard');
   }
 
   function isValidInput() {

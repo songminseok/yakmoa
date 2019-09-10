@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import './App.css';
@@ -8,6 +13,7 @@ import store from '../store';
 
 import Topbar from './Topbar';
 import Intro from './Intro';
+import Dashboard from './Dashboard';
 import Login from './Login';
 import Signup from './Signup';
 import Footer from './Footer';
@@ -53,9 +59,13 @@ function App() {
         <CssBaseline />
         <Router>
           <Topbar />
-          <Route path='/' exact component={Intro} />
-          <Route path='/login' component={Login} />
-          <Route path='/signup' component={Signup} />
+          <Switch>
+            <Route path='/' exact component={Intro} />
+            <Redirect from='/dash' to='/dashboard' />
+            <Route path='/dashboard' component={Dashboard} />
+            <Route path='/login' component={Login} />
+            <Route path='/signup' component={Signup} />
+          </Switch>
         </Router>
         <Footer />
       </div>

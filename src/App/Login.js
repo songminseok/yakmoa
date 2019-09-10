@@ -71,7 +71,7 @@ function Login({ loading, user, history, loginRequested }) {
   }
 
   function handleCloseAndHome() {
-    history.push('/');
+    history.push('/dashboard');
   }
 
   function isValidInput() {
