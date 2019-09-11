@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import logo from '../assets/topbar_logo.png';
-import * as firebase from 'firebase/app';
 import { logoutRequested } from '../store/actions';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,7 +63,7 @@ function LinkButton(props) {
   );
 }
 
-function Topbar({ user, history, logoutRequested }) {
+function Topbar({ user, logoutRequested }) {
   const classes = useStyles();
 
   function handleLogout() {
@@ -113,4 +112,4 @@ export default connect(
     user: state.user,
   }),
   { logoutRequested }
-)(withRouter(Topbar));
+)(Topbar);
