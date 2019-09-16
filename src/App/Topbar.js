@@ -9,12 +9,7 @@ import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import logo from '../assets/topbar_logo.png';
-
-// Firebase App (the core Firebase SDK) is always required and must be listed first
-import * as firebase from 'firebase/app';
-
-// Add the Firebase products that you want to use
-import 'firebase/auth';
+import { logoutRequested } from '../store/auth/actions';
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1 },
@@ -51,34 +46,28 @@ const useStyles = makeStyles((theme) => ({
   title: { flexGrow: 1 },
 }));
 
-function Topbar({ user, history }) {
+function LinkButton(props) {
   const classes = useStyles();
 
-  function LinkButton(props) {
-    return (
-      <Button
-        variant={props.variant ? props.variant : 'text'}
-        component={!props.onClick ? Link : 'button'}
-        className={classes.link}
-        href={props.to}
-        to={props.to}
-        onClick={props.onClick}
-        disableRipple
-      >
-        {props.children}
-      </Button>
-    );
-  }
+  return (
+    <Button
+      variant={props.variant ? props.variant : 'text'}
+      component={Link}
+      className={classes.link}
+      href={props.to}
+      to={props.to}
+      disableRipple
+    >
+      {props.children}
+    </Button>
+  );
+}
+
+function Topbar({ user, logoutRequested }) {
+  const classes = useStyles();
 
   function handleLogout() {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log('history push', history);
-        history.push('/');
-      });
-    // history.push('/');
+    logoutRequested();
   }
 
   return (
@@ -94,25 +83,21 @@ function Topbar({ user, history }) {
               {' '}
             </Box>
             <Typography component='div'>
-              {!user && <LinkButton to='/'>리폰소개</LinkButton>}
-              {!user ? (
-                <LinkButton to='/login'>로그인</LinkButton>
-              ) : (
-                <>
-                  <Typography
-                    variant='subtitle1'
-                    style={{ marginLeft: '40px' }}
-                    component='span'
-                  >
-                    {user.email}
-                  </Typography>
-                  <LinkButton onClick={handleLogout}>로그아웃</LinkButton>
-                </>
-              )}
+              <LinkButton to='/'>리폰소개</LinkButton>
+              {!user && <LinkButton to='/login'>로그인</LinkButton>}
               {!user && (
                 <LinkButton variant='contained' to='/signup'>
                   회원가입
                 </LinkButton>
+              )}
+              {user && (
+                <Button
+                  onClick={handleLogout}
+                  variant='contained'
+                  className={classes.link}
+                >
+                  {`${user.email}    `}로그아웃
+                </Button>
               )}
             </Typography>
           </Toolbar>
@@ -122,4 +107,9 @@ function Topbar({ user, history }) {
   );
 }
 
-export default connect((state) => ({ user: state.user }))(withRouter(Topbar));
+export default connect(
+  (state) => ({
+    user: state.auth.user,
+  }),
+  { logoutRequested }
+)(Topbar);

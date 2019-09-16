@@ -1,9 +1,0 @@
-export const SET_AUTHENTICATED = 'SET_AUTHENTICATED';
-export const SET_UNAUTHENTICATED = 'SET_UNAUTHENTICATED';
-export const SET_USER = 'SET_USER';
-export const LOADING_USER = 'LOADING_USER';
-export const LOG_IN_REQUESTED = 'LOG_IN_REQUESTED';
-export const LOG_IN_FAILED = 'LOG_IN_FAILED';
-export const CLEAR_LOG_IN_ERROR = 'CLEAR_LOG_IN_ERROR';
-export const LOG_OUT = 'LOG_OUT';
-export const SIGN_UP = 'SIGN_UP';

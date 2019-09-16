@@ -5,36 +5,33 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
+import Container from '@material-ui/core/Container';
+import {
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  DialogTitle,
+} from '@material-ui/core';
 
-/** firebase */
-import * as firebase from 'firebase';
-import 'firebase/auth';
-
-/** Yub */
 import * as yup from 'yup';
+import * as firebase from 'firebase/app';
 
-const schema = yup.object().shape({
-  passwordConfirm: yup
+const signupSchema = yup.object().shape({
+  email: yup
     .string()
-    .oneOf([yup.ref('password'), ''], 'Must match with password'),
+    .email()
+    .required('이메일이 필요해요'),
   password: yup
     .string()
     .min(6)
     .required(),
-  email: yup
+  passwordConfirm: yup
     .string()
-    .email()
+    .oneOf([yup.ref('password')], '패스워드가 일치하지 않습니다.')
     .required(),
-  // createdOn: yup.date().default(function() {
-  //   return new Date();
-  // }),
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -44,181 +41,158 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Signup(props) {
-  const classes = useStyles();
-  const [signupInfo, setSignUpInfo] = React.useState({
+export default function Signup({ history }) {
+  const [signupInfo, setSignupInfo] = React.useState({
     email: '',
     password: '',
     passwordConfirm: '',
-    errors: {},
   });
+  const [error, setError] = React.useState({
+    email: '',
+    password: '',
+    passwordConfirm: '',
+  });
+  const [loading, setLoading] = React.useState(false);
   const [user, setUser] = React.useState(null);
+  const classes = useStyles();
 
-  function signUp() {
-    // First Check if the 2 passwords match
-    const { email, password, passwordConfirm } = signupInfo;
-    if (password === passwordConfirm) {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(function(user) {
-          console.log('Successfully signed up');
-          setUser(user);
-        })
-        .catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          alert(`Failed to sign up. ${errorCode} : ${errorMessage}`);
-        });
-    } else {
-      alert('Password do not match!');
-    }
-  }
-
-  function validateInput(name, value) {
-    const newSignupInfo = { ...signupInfo, [name]: value };
-    schema
-      .validateAt(name, newSignupInfo)
-      .then(function(valid) {
-        newSignupInfo.errors[name] = '';
-        setSignUpInfo(newSignupInfo);
+  function validateInput(e, signupInfo) {
+    const name = e.target.name;
+    signupSchema
+      .validateAt(name, signupInfo)
+      .then((valid) => {
+        setError({ ...error, [name]: '' });
       })
-      .catch(function(error) {
-        newSignupInfo.errors[name] = error.message;
-        setSignUpInfo(newSignupInfo);
+      .catch((error) => {
+        setError({ ...error, [name]: error.message });
       });
   }
 
-  function handleBlur({ target: { name, value } }) {
-    validateInput(name, value);
+  function handleChange(e) {
+    const newSignupInfo = { ...signupInfo, [e.target.name]: e.target.value };
+    validateInput(e, newSignupInfo);
+    setSignupInfo(newSignupInfo);
   }
 
-  function handleChange({ target: { name, value } }) {
-    validateInput(name, value);
+  function handleBlur(e) {
+    validateInput(e, signupInfo);
   }
 
-  function handleClose(e) {
+  function handleSignup() {
+    const { email, password } = signupInfo;
+    setLoading(true);
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((user) => {
+        setLoading(false);
+        setUser(user);
+        console.log('Success', user);
+      })
+      .catch(function(error) {
+        setLoading(false);
+        console.log('Fail', error.message);
+      });
+  }
+
+  function handleClose() {
     setUser(null);
   }
 
-  function handleCloseAndLogin() {
-    handleClose();
-    props.history.push('/');
+  function handleCloseAndHome() {
+    setUser(null);
+    history.push('/dashboard');
   }
 
+  function isValidInput() {
+    return (
+      signupInfo.email &&
+      signupInfo.password &&
+      signupInfo.passwordConfirm &&
+      !error.email &&
+      !error.password &&
+      !error.passwordConfirm
+    );
+  }
+
+  const open = !!user;
+
   return (
-    <>
-      <Grid container spacing={2} direction='column' alignContent='center'>
-        <Grid item xs={4}>
-          <Typography variant='h3'>Sign up to YakMoa</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl className={classes.margin} fullWidth>
-            <InputLabel htmlFor='email'>Email</InputLabel>
-            <Input
-              id='email'
-              name='email'
-              type='email'
-              // value={signupInfo.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            <FormHelperText
-              id='email-helper-text'
-              error={!!signupInfo.errors.email}
-            >
-              {!signupInfo.errors.email ? '이메일' : signupInfo.errors.email}
-            </FormHelperText>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl className={classes.margin} fullWidth>
-            <InputLabel htmlFor='password'>Password</InputLabel>
-            <Input
-              id='password'
-              name='password'
-              type='password'
-              value={signupInfo.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            <FormHelperText
-              id='password-helper-text'
-              error={!!signupInfo.errors.password}
-            >
-              {!signupInfo.errors.password
-                ? '비밀번호'
-                : signupInfo.errors.password}
-            </FormHelperText>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl className={classes.margin} fullWidth>
-            <InputLabel htmlFor='passwordConfirm'>Confirm Password</InputLabel>
-            <Input
-              id='passwordConfirm'
-              name='passwordConfirm'
-              type='password'
-              value={signupInfo.passwordConfirm}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            <FormHelperText
-              id='passwordConfirm-helper-text'
-              error={!!signupInfo.errors.passwordConfirm}
-            >
-              {!signupInfo.errors.passwordConfirm
-                ? '비밀번호 확인'
-                : signupInfo.errors.passwordConfirm}
-            </FormHelperText>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl className={classes.margin} fullWidth>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={signUp}
-              disabled={
-                !signupInfo.email ||
-                !signupInfo.password ||
-                !signupInfo.passwordConfirm ||
-                !!signupInfo.errors.email ||
-                !!signupInfo.errors.password ||
-                !!signupInfo.errors.passwordConfirm
-              }
-            >
-              Sign Up
-            </Button>
-          </FormControl>
-        </Grid>
-      </Grid>
-      {/** Dialog */}
+    <Container maxWidth='xs'>
+      <Typography variant='h3'>Sign up to YakMoa</Typography>
+      <FormControl className={classes.margin} fullWidth>
+        <InputLabel htmlFor='input-username'>Email</InputLabel>
+        <Input
+          id='input-username'
+          name='email'
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <FormHelperText id='input-username-helper-text' error={!!error.email}>
+          {error.email}
+        </FormHelperText>
+      </FormControl>
+      <FormControl className={classes.margin} fullWidth>
+        <InputLabel htmlFor='input-password'>Password</InputLabel>
+        <Input
+          id='input-password'
+          name='password'
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <FormHelperText
+          id='input-password-helper-text'
+          error={!!error.password}
+        >
+          {error.password}
+        </FormHelperText>
+      </FormControl>
+      <FormControl className={classes.margin} fullWidth>
+        <InputLabel htmlFor='input-password-confirm'>
+          Confirm Password
+        </InputLabel>
+        <Input
+          id='input-password-confirm'
+          name='passwordConfirm'
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <FormHelperText
+          id='input-password-confirm-helper-text'
+          error={!!error.passwordConfirm}
+        >
+          {error.passwordConfirm}
+        </FormHelperText>
+      </FormControl>
+      <FormControl className={classes.margin} fullWidth>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={handleSignup}
+          disabled={!isValidInput() || loading}
+        >
+          Sign Up {loading && <CircularProgress />}
+        </Button>
+      </FormControl>
+
       <Dialog
-        open={!!user}
+        open={open}
         onClose={handleClose}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id='alert-dialog-title'>
-          {'회원 가입에 성공했어요.😀'}
-        </DialogTitle>
+        <DialogTitle id='alert-dialog-title'>{'회원가입 성공'}</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            축하합니다. 약모아 회원 가입에 성공했습니다. 홈으로 이동해 주세요.
+            회원이 되신 걸 축하드립니다.{' '}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color='primary'>
-            닫기
-          </Button>
-          <Button onClick={handleCloseAndLogin} color='primary' autoFocus>
-            홈으로 가기
+          <Button onClick={handleCloseAndHome} color='primary' autoFocus>
+            OK
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Container>
   );
 }

@@ -1,9 +1,9 @@
-import React from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import Typography from '@material-ui/core/Typography'
-import Container from '@material-ui/core/Container'
-import Divider from '@material-ui/core/Divider'
-import Link from '@material-ui/core/Link'
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
+import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles((theme) => ({
   root: { flexGrow: 1, padding: theme.spacing(1) },
@@ -17,10 +17,10 @@ const useStyles = makeStyles((theme) => ({
   link: {
     margin: theme.spacing(1),
   },
-}))
+}));
 
 export default function Footer() {
-  const classes = useStyles()
+  const classes = useStyles();
   return (
     <Container>
       <Divider className={classes.divider} />
@@ -40,9 +40,5 @@ export default function Footer() {
         </Link>
       </Typography>
     </Container>
-    // <div>
-    //   <hr />
-    //   <p>먹는 약을 등록하고 관리할 수 있습니다. Copyright by Minseok </p>
-    // </div>
-  )
+  );
 }

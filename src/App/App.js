@@ -1,18 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-
-// Import redux store
-import { Provider } from 'react-redux';
 import {
-  setAuthenticated,
-  setUnAuthenticated,
-  setUser,
-} from '../redux/actions';
-import store from '../redux/store';
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
+import { Provider } from 'react-redux';
 
 import './App.css';
+import * as authActions from '../store/auth/actions';
+import store from '../store/store';
+
 import Topbar from './Topbar';
 import Intro from './Intro';
+import Dashboard from './Dashboard';
 import Login from './Login';
 import Signup from './Signup';
 import Footer from './Footer';
@@ -40,29 +41,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 function App() {
-  /** User Auth check status */
   React.useEffect(() => {
-    return firebase.auth().onAuthStateChanged(function(user) {
-      store.dispatch(!user ? setUnAuthenticated() : setAuthenticated());
-      store.dispatch(setUser(user));
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(`${user.email} is authenticated`);
+        store.dispatch(authActions.setUser(user));
+      } else {
+        console.log('no user!');
+        store.dispatch(authActions.setUser(null));
+      }
     });
   }, []);
 
   return (
-    <div className='App'>
-      <Provider store={store}>
+    <Provider store={store}>
+      <div className='App'>
         <CssBaseline />
         <Router>
           <Topbar />
           <Switch>
             <Route path='/' exact component={Intro} />
+            <Redirect from='/dash' to='/dashboard' />
+            <Route path='/dashboard' component={Dashboard} />
             <Route path='/login' component={Login} />
             <Route path='/signup' component={Signup} />
           </Switch>
         </Router>
         <Footer />
-      </Provider>
-    </div>
+      </div>
+    </Provider>
   );
 }
 
