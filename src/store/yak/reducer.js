@@ -22,25 +22,25 @@ export default function(state = initialState, action) {
     case addYak.SUCCEEDED:
       return {
         ...state,
-        yaks: state.yaks.concat(action.payload),
+        yaks: state.yaks.concat(action.response),
         loading: false,
       };
     case updateYak.SUCCEEDED:
       return {
         ...state,
         yaks: state.yaks.map((yak) =>
-          yak.id === action.payload.id ? action.payload : yak
+          yak.id === action.response.id ? action.response : yak
         ),
         loading: false,
       };
     case removeYak.SUCCEEDED:
       return {
         ...state,
-        yaks: state.yaks.filter((yak) => yak.id !== action.payload.id),
+        yaks: state.yaks.filter((yak) => yak.id !== action.response.id),
         loading: false,
       };
     case fetchYaks.SUCCEEDED:
-      return { ...state, yaks: action.payload, loading: false };
+      return { ...state, yaks: action.response, loading: false };
     case upload.REQUESTED:
       return { ...state, uploading: true, error: {} };
     case upload.FAILED:

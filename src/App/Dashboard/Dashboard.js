@@ -7,26 +7,31 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
+import {
+  addYak,
+  removeYak,
+  updateYak,
+  fetchYaks,
+  upload,
+} from '../../store/yak/actions';
+
 import YakItem from './YakItem';
 import AddYakItem from './AddYakItem';
 
-const yaks = [
-  { name: '타이레놀', period: 3 },
-  { name: '애브빌', period: 3 },
-  { name: '펜잘', period: 3 },
-  { name: '여명808', period: 1 },
-  { name: '모닝케아', period: 3 },
-  { name: '박카스', period: 10 },
-];
-
-function Dashboard({ user }) {
+function Dashboard(props) {
+  const { user, yaks, fetchYaksRequested } = props;
   const [deleteMode, setDeleteMode] = React.useState(false);
+  React.useEffect(() => {
+    fetchYaksRequested();
+    return () => {
+      console.log('Dashboard unmounted');
+    };
+  }, [fetchYaksRequested]);
+
+  console.log('Dashboard', props);
+
   if (!user) {
     return <Redirect to='/' />;
-  }
-
-  function handleAdd() {
-    console.log('handleAdd');
   }
 
   function handleDelete() {
@@ -41,8 +46,8 @@ function Dashboard({ user }) {
       </Box>
       <Grid container>
         {yaks.map((yak, index) => (
-          <Grid key={`${yak.name}${yak.index}`} item xs={3}>
-            <YakItem yak={yak} />
+          <Grid key={`${yak.name}${index}`} item xs={3}>
+            <YakItem yak={yak} deleteMode={deleteMode} />
           </Grid>
         ))}
       </Grid>
@@ -50,4 +55,23 @@ function Dashboard({ user }) {
   );
 }
 
-export default connect((state) => ({ user: state.user }))(Dashboard);
+const mapStateToProps = (state) => ({
+  user: state.auth.user,
+  yaks: state.yak.yaks,
+  loading: state.yak.loading,
+  uploading: state.yak.uploading,
+  error: state.yak.error,
+});
+
+const mapDispatchToProps = {
+  ...addYak.actions,
+  ...removeYak.actions,
+  ...updateYak.actions,
+  ...fetchYaks.actions,
+  ...upload.actions,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Dashboard);

@@ -10,12 +10,13 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import UploadIcon from '@material-ui/icons/CloudUpload';
 import ListItemText from '@material-ui/core/ListItemText';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import pillsImage from '../../assets/pills.jpg';
-import { upload } from '../../api/yak';
+
+import { useDispatch } from 'react-redux';
+import { addYak } from '../../store/yak/actions';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -31,7 +32,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddYakItem() {
+  const [yak, setYak] = React.useState({ name: 'Unknown', period: 3 });
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const addItem = React.useCallback(
+    () => dispatch(addYak.actions.addYakRequested(yak)),
+    [dispatch, yak]
+  );
 
   const [open, setOpen] = React.useState(false);
   const [pic, setPic] = React.useState({ file: null, previewUrl: pillsImage });
@@ -68,7 +75,13 @@ export default function AddYakItem() {
 
   function handleAdd() {
     // add image to store
-    upload(pic.file);
+    // upload(pic.file);
+    addItem();
+  }
+
+  function handleChange(e) {
+    console.log('handleChange', e.target.name, e.target.value);
+    setYak({ ...yak, [e.target.name]: e.target.value });
   }
 
   return (
@@ -89,17 +102,27 @@ export default function AddYakItem() {
               <img
                 className={classes.image}
                 src={pic.previewUrl}
-                alt='Upload Image'
+                alt='Upload'
               />
             </Button>
           </ListItem>
           <ListItem>
             <form>
-              <TextField label='약 이름' margin='normal' fullWidth />
+              <TextField
+                label='약 이름'
+                margin='normal'
+                name='name'
+                value={yak.name}
+                fullWidth
+                onChange={handleChange}
+              />
               <TextField
                 label='하루 복용횟수'
+                name='period'
+                value={yak.period}
                 margin='normal'
                 fullWidth
+                onChange={handleChange}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position='end' style={{ width: '60px' }}>

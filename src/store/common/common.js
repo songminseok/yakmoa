@@ -11,9 +11,15 @@ export const createAjaxActions = (action) => {
 
     get actions() {
       return {
-        requested: (payload) => ({ type: this.REQUESTED, payload }),
-        succeeded: (response) => ({ type: this.SUCCEEDED, response }),
-        failed: (error) => ({ type: this.FAILED, error }),
+        [`${action}Requested`]: (payload) => ({
+          type: this.REQUESTED,
+          payload,
+        }),
+        [`${action}Succeeded`]: (response) => ({
+          type: this.SUCCEEDED,
+          response,
+        }),
+        [`${action}Failed`]: (error) => ({ type: this.FAILED, error }),
       };
     },
   };

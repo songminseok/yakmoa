@@ -41,4 +41,4 @@ function Intro({ user }) {
   );
 }
 
-export default connect((state) => ({ user: state.user }))(Intro);
+export default connect((state) => ({ user: state.auth.user }))(Intro);

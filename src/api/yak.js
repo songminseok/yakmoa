@@ -1,5 +1,6 @@
 import * as firebase from 'firebase/app';
 import 'firebase/storage';
+import 'firebase/firestore';
 
 export function upload(file) {
   let storageRef = firebase.storage().ref();
@@ -25,6 +26,8 @@ export function upload(file) {
         case firebase.storage.TaskState.RUNNING: // or 'running'
           console.log('Upload is running');
           break;
+        default:
+          console.log('state', snapshot.state);
       }
     },
     function(error) {
@@ -38,4 +41,34 @@ export function upload(file) {
       });
     }
   );
+}
+
+export function fetch() {
+  return firebase
+    .firestore()
+    .collection('yaks')
+    .get();
+}
+
+export function add(yak) {
+  return firebase
+    .firestore()
+    .collection('yaks')
+    .add(yak);
+}
+
+export function remove(yak) {
+  return firebase
+    .firestore()
+    .collection('yaks')
+    .doc(yak.id)
+    .delete();
+}
+
+export function update(yak) {
+  return firebase
+    .firestore()
+    .collection('yaks')
+    .doc(yak.id)
+    .set(yak);
 }

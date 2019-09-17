@@ -1,6 +1,8 @@
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import { all, fork } from 'redux-saga/effects';
 import authSaga from './auth/sagas';
+import yakSaga from './yak/sagas';
 import authReducer from './auth';
 import yakReducer from './yak';
 
@@ -17,5 +19,8 @@ const store = createStore(
 
 export default store;
 
+function* rootSaga() {
+  yield all([fork(authSaga), fork(yakSaga)]);
+}
 // then run the saga
-sagaMiddleware.run(authSaga);
+sagaMiddleware.run(rootSaga);
