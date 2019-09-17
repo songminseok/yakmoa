@@ -26,16 +26,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
 
-// TODO: Replace the following with your app's Firebase project configuration
-const firebaseConfig = {
-  apiKey: 'AIzaSyDE9-USX4OY8Afh5dGeDhX8N1Lt-28p6Ds',
-  authDomain: 'yakmoa-80569.firebaseapp.com',
-  databaseURL: 'https://yakmoa-80569.firebaseio.com',
-  projectId: 'yakmoa-80569',
-  storageBucket: 'yakmoa-80569.appspot.com',
-  messagingSenderId: '692085812753',
-  appId: '1:692085812753:web:65aae7b8840d046e',
-};
+import { firebaseConfig } from '../config';
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
